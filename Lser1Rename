@@ -1,0 +1,37 @@
+#!/bin/bash
+#
+#module load maker/3.01.02-beta
+#
+
+ORGGFF=$home/Lettuce_submission/Lser1_1_V10/Lser_1_Genome_v10.01.maker.gff
+n=1
+File=lser1_v10_chr
+Pattern=Lser_1_v10_chr
+Prefix=LSER_V10C
+
+for i in {1..9} 0
+do
+    grep "$Pattern$i" $ORGGFF > $File$i.gff
+    
+    if [ -f $File$i.gff ]; then
+        echo $File$i.gff
+	maker_map_ids --prefix $Prefix$i --initial $n --justify 7 $File$i.gff > $File$i.map
+	m=$(cut -f 3 $File$i.gff | grep "gene" | wc -l)
+	n=$(($n+$m)) 
+	echo $File$i.map
+	if [ -f $File$i.map ]; then 
+    		perl -p -i -e 's/([0-9])\n/${1}0 \n/' $File$i.map
+		perl -p -i -e 's/\-RA\n/0\-RA \n/' $File$i.map
+    	else
+        	echo "File not existed: $File$i.map"
+    	fi
+	cp $File$i.gff $File$i.renamed.gff
+	map_gff_ids $File$i.map $File$i.renamed.gff 2>> log.txt
+	perl -p -i -e 's/Name.+//' $File$i.renamed.gff
+	echo $File$i.renamed.gff
+	echo Number of genes: $m, $(($n-$m)) - $(($n-1)) 
+    else
+        echo "File not existed: $File$i.gff"
+    fi
+
+done
