@@ -62,8 +62,8 @@ while (<$IN>) {
 
     my $func = $blast->{$id} || 'Name:"Protein of unknown function"';
 
-    my $header = ">$id";
-    $header .= " $mol_type " if $mol_type;
+    my $header = ">$id ";
+    $header .= "$mol_type " if $mol_type;
     $header .= "$func " if $func;
     $header .= join " ", @attrbs if @attrbs;
 
